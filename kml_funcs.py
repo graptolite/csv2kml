@@ -12,52 +12,43 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-def makeXml(tag,contents=""):
-    ''' if options are needed for the tag, make the tag into a dictionary:
-        {"tag_name":"tag-options"}
-        This can be applied to mix-and-match lists as well:
-        [{"tag_name":"tag-options"},"tag_name",{"tag_name":"tag-options"}]
+def make_xml(tag,contents=""):
+    ''' if options are needed for the tag, separate them with a space from the tag name e.g. tag='div style="width:100%;"'
     '''
     def tag_str(tag,contents):
-        if isinstance(tag,str):
-            tag_only = tag
-            option = ""
-        elif isinstance(tag,dict):
-            tag_only = list(tag.keys())[0]
-            option = " %s" % list(tag.values())[0]
-
-        return "<%s%s>\n%s\n</%s>" % (tag_only,option,contents,tag_only)
+        tag_only = tag.split(" ")[0]
+        return "<%s>\n%s\n</%s>" % (tag,contents,tag_only)
 
     if isinstance(tag,str):
         out = tag_str(tag,contents)
     elif isinstance(tag,list):
         if len(tag) > 1:
-            out = makeXml(tag[:-1],tag_str(tag[-1],contents))
+            out = make_xml(tag[:-1],tag_str(tag[-1],contents))
         else:
             out = tag_str(tag[0],contents)
     else:
         print("Warning: Tag doesn't seem to be a normal ML tag (should be a string or list of strings)")
     return out
 
-def makeCdata(contents=""):
+def make_cdata(contents=""):
     ## declare contents as character data e.g. not parsed as the "X"ML
     return "<![CDATA[\n%s\n]]>" % contents
 
-def initKml(contents=""):
+def init_kml(contents=""):
     ## shove some contents into configured kml and document tags
-    return makeXml([{"kml":'xmlns="http://www.opengis.net/kml/2.2"'},"Document"],contents)
+    return make_xml(['kml xmlns="http://www.opengis.net/kml/2.2"',"Document"],contents)
 
-def kmlFolder(name,contents=""):
-    return makeXml("Folder",makeXml("name",name)+contents)
+def kml_folder(name,contents=""):
+    return make_xml("Folder",make_xml("name",name)+contents)
 
-def makePlacemark(name,coordinates,description="",icon_scale=1.0,icon_marker="http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png"):
+def make_placemark(name,coordinates,description="",icon_scale=1.0,icon_marker="http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png"):
     ''' coordinates in format:
         lon,lat e.g. -2.334,49.294
     '''
-    return makeXml("Placemark",
-                   makeXml("name",name)+
-                   makeXml("description",makeCdata(description))+
-                   makeXml(["Style","IconStyle"],
-                           makeXml("scale",icon_scale)+
-                           makeXml(["Icon","href"],icon_marker))+
-                   makeXml(["Point","coordinates"],coordinates))
+    return make_xml("Placemark",
+                   make_xml("name",name)+
+                   make_xml("description",make_cdata(description))+
+                   make_xml(["Style","IconStyle"],
+                           make_xml("scale",icon_scale)+
+                           make_xml(["Icon","href"],icon_marker))+
+                   make_xml(["Point","coordinates"],coordinates))

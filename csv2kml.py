@@ -18,8 +18,8 @@ import exifread
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from kml_funcs import *
-from coord_funcs import *
+from kml_funcs import init_kml,kml_folder,make_placemark
+from coord_funcs import grid_ref2osgb,osgbEN2wgsLatLon
 import config
 
 def img_taken_time(img_path):
@@ -54,11 +54,11 @@ for _,row in df.iterrows():
         contents = str(desc)
 
 
-    all_placemarks += makePlacemark(name,
+    all_placemarks += make_placemark(name,
                                     "%.15f,%.15f" % (lon,lat),
                                     contents)
 
-kml = initKml(kmlFolder(config.KML_FOLDER_NAME,all_placemarks))
+kml = init_kml(kml_folder(config.KML_FOLDER_NAME,all_placemarks))
 
 with open(config.KML_FILE_NAME,"w") as outfile:
     outfile.write(kml)
