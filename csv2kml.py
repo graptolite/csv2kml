@@ -22,8 +22,6 @@ from kml_funcs import *
 from coord_funcs import *
 import config
 
-folder_name = config.KML_FOLDER_NAME
-
 def img_taken_time(img_path):
     with open(img_path,"rb") as infile:
         tags = exifread.process_file(infile, stop_tag="EXIF DateTimeOriginal")
@@ -46,21 +44,21 @@ for _,row in df.iterrows():
     E,N = grid_ref2osgb(grid_ref)
     lat,lon,_ = osgbEN2wgsLatLon(E,N)
     img_name = row["img"]
-    desc = row["desc"]
+    desc = row["desc"].strip()
 
     if img_name != "":
         img_path = os.path.join(config.IMG_DIR,img_name)
         time_taken = img_taken_time(img_path)
         contents = '<img src="%s" width="250px"></br></br>Time Taken: %s</br>%s' % (img_path,time_taken,desc)
     else:
-        contents = '%s' % (desc)
+        contents = str(desc)
 
 
     all_placemarks += makePlacemark(name,
-                                    "%s,%s" % (lon,lat),
+                                    "%.15f,%.15f" % (lon,lat),
                                     contents)
 
-kml = initKml(kmlFolder(folder_name,all_placemarks))
+kml = initKml(kmlFolder(config.KML_FOLDER_NAME,all_placemarks))
 
 with open(config.KML_FILE_NAME,"w") as outfile:
     outfile.write(kml)

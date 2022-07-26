@@ -38,15 +38,11 @@ def letter_grid2numbers(letters):
     return (E_500 + transform_E_500)*5 + E_100, (N_500 + transform_N_500)*5 + N_100
 
 def grid_ref2osgb(grid_ref):
-    ''' convert grid reference to (E,N) tuple.
+    ''' convert grid reference to (E,N) tuple
     Note: decimals in the grid reference are not currently supported
     '''
     letters = grid_ref[:2]
-    try:
-        E_pre = str(int(letters[0]))
-        N_pre = str(int(letters[1]))
-    except ValueError:
-        E_pre,N_pre = letter_grid2numbers(letters)
+    E_pre,N_pre = letter_grid2numbers(letters)
 
     numbers = grid_ref[2:].strip()
     if len(numbers) == 0:
@@ -79,7 +75,7 @@ osgb36_data = {"a":6377563.396,
 wgs84_data = {"a":6378137.000,
               "b":6356752.3141}
 
-def osgbEN2osgbLatLon(E,N,H=0):
+def osgbEN2osgbLatLon(E,N):
     '''
     Convert Northing (N), Easting (E) and optional altitude (H) on an OSGB36 ellipsoid to Latitude (osgb_phi) and Longitude (osgb_lam) on an OSGB36 ellipsoid
     '''
@@ -173,9 +169,6 @@ def osgbCartesian2wgsCartesian(v_osgb):
 
     v_t = np.array([t_x,t_y,t_z])
 
-    a = wgs84_data["a"]
-    b = wgs84_data["b"]
-
     v_wgs = np.linalg.solve(helmert_matrix,v_osgb - v_t)
     return v_wgs
 
@@ -217,7 +210,7 @@ def osgbEN2wgsLatLon(E,N,H=0):
             N: Northing
             H: Altitude AOD
     '''
-    phi_osgb,lam_osgb = osgbEN2osgbLatLon(E,N,H)
+    phi_osgb,lam_osgb = osgbEN2osgbLatLon(E,N)
     v_osgb = osgbLatLon2osgbCartesian(phi_osgb,lam_osgb,H)
     v_wgs = osgbCartesian2wgsCartesian(v_osgb)
     phi_wgs,lam_wgs,H = wgsCartesian2wgsLatLon(v_wgs)

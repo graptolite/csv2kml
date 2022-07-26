@@ -19,18 +19,18 @@ def makeXml(tag,contents=""):
         [{"tag_name":"tag-options"},"tag_name",{"tag_name":"tag-options"}]
     '''
     def tag_str(tag,contents):
-        if type(tag) == str:
+        if isinstance(tag,str):
             tag_only = tag
             option = ""
-        elif type(tag) == dict:
+        elif isinstance(tag,dict):
             tag_only = list(tag.keys())[0]
             option = " %s" % list(tag.values())[0]
 
-        return "<%s%s>\n%s\n</%s>\n" % (tag_only,option,contents,tag_only)
+        return "<%s%s>\n%s\n</%s>" % (tag_only,option,contents,tag_only)
 
-    if type(tag) == str:
+    if isinstance(tag,str):
         out = tag_str(tag,contents)
-    elif type(tag) == list:
+    elif isinstance(tag,list):
         if len(tag) > 1:
             out = makeXml(tag[:-1],tag_str(tag[-1],contents))
         else:
